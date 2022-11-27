@@ -17,7 +17,7 @@ score = 0       #Initial Score
 run = True      #Initial State of Flappy
 
 while run:
-    clock.tick(30)
+    clock.tick(5000)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
