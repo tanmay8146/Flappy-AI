@@ -15,6 +15,9 @@ IMG_PIPE = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "pipe
 IMG_BASE = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "base.png")))
 IMG_BG = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bg.png")))
 
+pygame.font.init()
+STAT_FONT = pygame.font.SysFont("comicsans", 50)
+
 class Bird:
             #Author @TanmayXD
     IMGS = IMG_BIRDS
@@ -154,55 +157,15 @@ class Base:
         win.blit(self.IMG, (self.x1, self.y))
         win.blit(self.IMG, (self.x2, self.y))
 
-def draw_win(win, bird, pipes, base):
+def draw_win(win, bird, pipes, base, score):
     win.blit(IMG_BG, (0,0))
     for pipe in pipes:
         pipe.draw(win)
+
+    text = STAT_FONT.render("score: "+str(score), 1, (255, 255, 255))
+    win.blit(text, (GWIN_WIDTH-10-text.get_width(), 10))
     base.draw(win)
     bird.draw(win)
     pygame.display.update()
 
-
-if __name__ == "__main__":
-    bird = Bird(230, 350)
-    base = Base(730)
-    pipes = [Pipe(730)]
-    win = pygame.display.set_mode((GWIN_WIDTH, GWIN_HEIGHT))
-    clock = pygame.time.Clock()
-
-    score = 0
-
-    run = True
-    while run:
-        clock.tick(30)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-
-        rem  = []
-        add_pipe = False
-        for pipe in pipes:
-            if pipe.collide(bird):
-                pass
-            if pipe.x + pipe.PIPE_TOP.get_width() < 0:
-                rem.append(pipe)
-            if not pipe.passed and pipe.x < bird.x:
-                pipe.passed = True
-                add_pipe = True
-            pipe.move()
-        if add_pipe:
-            score += 1
-            pipes.append(Pipe(600))
-            pipe.move()
-            print(score)
-
-        for r in rem:
-            pipes.remove(r)
-
-        if bird.y + bird.img.get_height() >= 730:
-            pass
-
-        base.move()
-        draw_win(win, bird, pipes, base)
-    pygame.quit()
-    quit()
+print("NO ERROR ON MAIN MODULE!\nYOU ARE GOOD TO GO!")

@@ -45,6 +45,6 @@ while run:
     if bird.y + bird.img.get_height() >= 730:
         pass
     base.move()
-    draw_win(win, bird, pipes, base)
+    draw_win(win, bird, pipes, base, score)
 pygame.quit()
 quit()
