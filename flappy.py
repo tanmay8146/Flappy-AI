@@ -16,7 +16,7 @@ IMG_BASE = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "base
 IMG_BG = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs", "bg.png")))
 
 pygame.font.init()
-STAT_FONT = pygame.font.SysFont("comicsans", 50)
+STAT_FONT = pygame.font.SysFont("comicsans", 30)
 
 class Bird:
             #Author @TanmayXD
@@ -41,7 +41,7 @@ class Bird:
         self.height = self.y
 
     def move(self):
-        self.tick_count = 1
+        self.tick_count += 1
 
         displacement = self.vel*self.tick_count + 1.5*self.tick_count**2
         d = displacement
@@ -162,14 +162,21 @@ def draw_win(win, birds, pipes, base, score):
     for pipe in pipes:
         pipe.draw(win)
 
-    text = STAT_FONT.render("score: "+str(score), 1, (255, 255, 255))
-    win.blit(text, (GWIN_WIDTH-10-text.get_width(), 10))
+    score_text = STAT_FONT.render("score: "+str(score), 1, (255, 255, 255))
+    tick_text = STAT_FONT.render("tick-rate: "+str(tick_rate(score)), 1, (255, 255, 255))
+    alive_text = STAT_FONT.render("alive: "+str(len(ge)), 1, (255, 255, 255))
+    dev = STAT_FONT.render('TanmayXD', 1, (255, 255, 255))
+    win.blit(score_text, (GWIN_WIDTH-60-score_text.get_width(), 10))
+    win.blit(tick_text, (GWIN_WIDTH-60-score_text.get_width(), 40))
+    win.blit(alive_text, (GWIN_WIDTH-60-score_text.get_width(), 70))
+    win.blit(dev, (GWIN_WIDTH-300-score_text.get_width(), 10))
     base.draw(win)
     for bird in birds:
         bird.draw(win)
     pygame.display.update()
 
 def main(genomes, config):
+    global ge
     print("Flappy-AI :: running on- "+showOS())
     print("Developer :: "+devInfo())
     nets = []
@@ -192,7 +199,8 @@ def main(genomes, config):
     run = True      #Initial State of Flappy
 
     while run:
-        clock.tick(30)
+        rate= tick_rate(score)
+        clock.tick(rate)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -202,7 +210,7 @@ def main(genomes, config):
         pipe_ind = 0
         if len(birds) > 0:
             if len(pipes) > 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width():
-                pipe_ind += 1
+                pipe_ind = 1
         else:
             run = False
             break
@@ -215,7 +223,6 @@ def main(genomes, config):
 
             if output[0] > 0.5:
                 bird.jump()
-        base.move()
 
         rem = []
         add_pipe = False
@@ -238,9 +245,9 @@ def main(genomes, config):
             score += 1
             for g in ge:
                 g.fitness += 5
-            pipes.append(Pipe(600))
-            pipe.move()
-            print("current score: "+str(score))
+            pipes.append(Pipe(GWIN_WIDTH))
+            # pipe.move()
+            print("Current Score: "+str(score)+"\tBirds Alive: "+str(len(ge))+"\tTick Rate: "+str(rate))
 
         for r in rem:
             pipes.remove(r)
@@ -250,8 +257,15 @@ def main(genomes, config):
                 birds.pop(x)
                 nets.pop(x)
                 ge.pop(x)
-
+        base.move()
         draw_win(win, birds, pipes, base, score)
+
+def tick_rate(score):
+    t_rate = 30
+    diff = 10
+    for score in range(0, score, diff):
+        t_rate += 4
+    return t_rate
 
 def run(config_path):
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
